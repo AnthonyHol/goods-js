@@ -1,0 +1,23 @@
+{
+  "name": "goods",
+  "version": "1.0.0",
+  "description": "Sample REST server using Node.js and pg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yeskel655/goods.git"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon index.js"
+  },
+  "author": "Alexey",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
