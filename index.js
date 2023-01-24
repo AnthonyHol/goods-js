@@ -1,19 +1,21 @@
 const { Pool } = require('pg');
 const express = require('express');
+const dotenv = require('dotenv')
 
 const app = express();
 app.use(express.json());
+dotenv.config()
 
 // db config
 const pool = new Pool({
-  host: 'localhost',
-  database: 'test_db',
-  user: 'postgres',
-  password: 'admin',
-  port: 5432,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  port: process.env.PORT,
+  max: process.env.MAX,
+  idleTimeoutMillis: process.env.IDLETIMEOUTMILLIS,
+  connectionTimeoutMillis: process.env.CONNECTIONTIMEOUTMILLIS,
 });
 
 // API functions for categories
@@ -102,7 +104,7 @@ const deleteCategory = (request, response, next) => {
 const getGoods = (request, response) => {
   pool.connect((error, client, release) => {
     client.query(
-      'SELECT product_id, product_name,category_name,price FROM public.goods, \
+      'SELECT product_id, product_name, category_name, price FROM public.goods, \
       public.categories WHERE public.goods.category_id = public.categories.category_id',
       (error, result) => {
         release();
