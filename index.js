@@ -24,10 +24,13 @@ const getCategories = (request, response) => {
       (error, result) => {
         release();
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error executing query', stack: error.stack });
+            .send({ message: 'Error when getting a categories' });
         }
+
         response.send(result.rows);
       },
     );
@@ -47,10 +50,13 @@ const postCategory = (request, response) => {
     client.query('INSERT INTO public.categories (category_name) VALUES ($1)', [category_name],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when creating a category', stack: error.stack });
+            .send({ message: 'Error when creating a category' });
         }
+
         response.status(201).send(results.rows[0]);
       });
   });
@@ -72,10 +78,13 @@ const putCategory = (request, response) => {
       [category_name, id],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when changing the category', stack: error.stack });
+            .send({ message: 'Error when changing the category' });
         }
+
         response.status(200).send(`The category was modified with ID: ${id}`);
       },
     );
@@ -89,10 +98,13 @@ const deleteCategory = (request, response, next) => {
     client.query('DELETE FROM public.categories WHERE category_id = $1', [id],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when deleting the category', stack: error.stack });
+            .send({ message: 'Error when deleting the category' });
         }
+
         response.status(204).send(`The category deleted with ID: ${id}`);
       });
   });
@@ -107,10 +119,13 @@ const getGoods = (request, response) => {
       (error, result) => {
         release();
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error executing query', stack: error.stack });
+            .send({ message: 'Error executing query' });
         }
+
         response.send(result.rows);
       },
     );
@@ -130,9 +145,11 @@ const postGood = (request, response) => {
     client.query('INSERT INTO public.goods (category_id, product_name) VALUES ($1, $2)', [category_id, product_name],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when creating a product', stack: error.stack });
+            .send({ message: 'Error when creating a product' });
         }
         response.status(201).send(results.rows[0]);
       });
@@ -155,10 +172,13 @@ const putGood = (request, response) => {
       [product_name, id],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when changing the product', stack: error.stack });
+            .send({ message: 'Error when changing the product' });
         }
+
         response.status(200).send(`The product was modified with ID: ${id}`);
       },
     );
@@ -172,10 +192,13 @@ const deleteGood = (request, response, next) => {
     client.query('DELETE FROM public.goods WHERE product_id = $1', [id],
       (error, results) => {
         if (error) {
+          console.error(error.stack);
+
           return response
             .status(500)
-            .send({ message: 'Error when deleting the product', stack: error.stack });
+            .send({ message: 'Error when deleting the product' });
         }
+
         response.status(204).send(`The product deleted with ID: ${id}`);
       });
   });
