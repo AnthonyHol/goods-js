@@ -76,7 +76,7 @@ const putCategory = (request, response) => {
             .status(500)
             .send({ message: 'Error when changing the category', stack: error.stack });
         }
-        response.status(200).send(`The category was modified with ID: ${id}`);
+        response.status(200).send(JSON.stringify({ "category_id": id, "category_name": category_name }));
       },
     );
   });
@@ -159,7 +159,7 @@ const putGood = (request, response) => {
             .status(500)
             .send({ message: 'Error when changing the product', stack: error.stack });
         }
-        response.status(200).send(`The product was modified with ID: ${id}`);
+        response.status(200).send(JSON.stringify({ "product_id": id, "product_name": product_name }));
       },
     );
   });
