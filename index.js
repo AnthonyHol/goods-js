@@ -51,7 +51,7 @@ const postCategory = (request, response) => {
             .status(500)
             .send({ message: 'Error when creating a category', stack: error.stack });
         }
-        response.status(201).send(results.rows[0]);
+        response.status(201).send(JSON.stringify({ "category_name": category_name }));
       });
   });
 };
@@ -134,7 +134,7 @@ const postGood = (request, response) => {
             .status(500)
             .send({ message: 'Error when creating a product', stack: error.stack });
         }
-        response.status(201).send(results.rows[0]);
+        response.status(201).send(JSON.stringify({ "product_name": product_name }));
       });
   });
 };
