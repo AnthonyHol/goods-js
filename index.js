@@ -1,21 +1,19 @@
 const { Pool } = require('pg');
 const express = require('express');
-const dotenv = require('dotenv')
-dotenv.config()
 
 const app = express();
 app.use(express.json());
 
 // db config
 const pool = new Pool({
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  user: process.env.USER,
-  password: process.env.PASSWORD,
-  port: process.env.PORT,
-  max: process.env.MAX,
-  idleTimeoutMillis: process.env.IDLETIMEOUTMILLIS,
-  connectionTimeoutMillis: process.env.CONNECTIONTIMEOUTMILLIS,
+  host: 'localhost',
+  database: 'test_db',
+  user: 'postgres',
+  password: 'admin',
+  port: 5432,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
 });
 
 // API functions for categories
@@ -30,7 +28,6 @@ const getCategories = (request, response) => {
             .status(500)
             .send({ message: 'Error executing query', stack: error.stack });
         }
-
         response.send(result.rows);
       },
     );
@@ -54,8 +51,7 @@ const postCategory = (request, response) => {
             .status(500)
             .send({ message: 'Error when creating a category', stack: error.stack });
         }
-
-        response.status(201).send(`The category '${category_name}' has been added`);
+        response.status(201).send(results.rows[0]);
       });
   });
 };
@@ -80,7 +76,6 @@ const putCategory = (request, response) => {
             .status(500)
             .send({ message: 'Error when changing the category', stack: error.stack });
         }
-
         response.status(200).send(`The category was modified with ID: ${id}`);
       },
     );
@@ -98,7 +93,6 @@ const deleteCategory = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the category', stack: error.stack });
         }
-
         response.status(204).send(`The category deleted with ID: ${id}`);
       });
   });
@@ -117,7 +111,6 @@ const getGoods = (request, response) => {
             .status(500)
             .send({ message: 'Error executing query', stack: error.stack });
         }
-
         response.send(result.rows);
       },
     );
@@ -126,7 +119,7 @@ const getGoods = (request, response) => {
 
 const postGood = (request, response) => {
   pool.connect((error, client) => {
-    const { category_id, product_name, price } = request.body;
+    const { category_id, product_name } = request.body;
 
     if (!product_name || !category_id) {
       return response
@@ -134,17 +127,14 @@ const postGood = (request, response) => {
         .send({ message: 'The request must contain the product_name or the category_id!' });
     }
 
-    client.query('INSERT INTO public.goods (category_id, product_name, price) VALUES ($1, $2, $3)', 
-      [category_id, product_name, price], 
+    client.query('INSERT INTO public.goods (category_id, product_name) VALUES ($1, $2)', [category_id, product_name],
       (error, results) => {
         if (error) {
           return response
             .status(500)
             .send({ message: 'Error when creating a product', stack: error.stack });
         }
-
-        response.status(201).send(`The product '${product_name}' \
-        with category_id = ${category_id} and price = ${price} has been added`);
+        response.status(201).send(results.rows[0]);
       });
   });
 };
@@ -169,7 +159,6 @@ const putGood = (request, response) => {
             .status(500)
             .send({ message: 'Error when changing the product', stack: error.stack });
         }
-
         response.status(200).send(`The product was modified with ID: ${id}`);
       },
     );
@@ -187,7 +176,6 @@ const deleteGood = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the product', stack: error.stack });
         }
-
         response.status(204).send(`The product deleted with ID: ${id}`);
       });
   });
