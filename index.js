@@ -119,7 +119,7 @@ const getGoods = (request, response) => {
 
 const postGood = (request, response) => {
   pool.connect((error, client) => {
-    const { category_id, product_name } = request.body;
+    const { category_id, product_name, price } = request.body;
 
     if (!product_name || !category_id) {
       return response
@@ -127,7 +127,8 @@ const postGood = (request, response) => {
         .send({ message: 'The request must contain the product_name or the category_id!' });
     }
 
-    client.query('INSERT INTO public.goods (category_id, product_name) VALUES ($1, $2)', [category_id, product_name],
+    client.query('INSERT INTO public.goods (category_id, product_name, price) VALUES ($1, $2, $3)',
+      [category_id, product_name, price],
       (error, results) => {
         if (error) {
           return response
