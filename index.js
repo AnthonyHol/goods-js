@@ -66,9 +66,19 @@ const getCategories = (request, response) => {
         }
 
         response.send(result.rows);
-      },
+      }
     );
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
+
+
 };
 
 const postCategory = (request, response) => {
@@ -82,7 +92,7 @@ const postCategory = (request, response) => {
     }
 
     var valid = ajv.validate(postCategorySheme, category_name);
-    
+
     if (valid) {
       client.query('INSERT INTO public.categories (category_name) VALUES ($1)', [category_name],
         (error, results) => {
@@ -100,6 +110,14 @@ const postCategory = (request, response) => {
       console.error(ajv.errors);
       response.status(400).send('Enter the correct data');
     }
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -114,6 +132,7 @@ const putCategory = (request, response) => {
         .send({ message: 'The request must contain the category_name!' });
     }
     var valid = ajv.validate(putCategorySheme, { category_name, id });
+
     if (valid) {
       client.query(
         'UPDATE public.categories SET category_name = $1 WHERE category_id = $2',
@@ -129,23 +148,18 @@ const putCategory = (request, response) => {
           response.status(200).send(JSON.stringify({ "category_id": id, "category_name": category_name }));
         },
       );
-      
     } else {
       console.error(ajv.errors);
       response.status(400).send('Enter the correct data');
     }
-    client.query(
-      'UPDATE public.categories SET category_name = $1 WHERE category_id = $2',
-      [category_name, id],
-      (error, results) => {
-        if (error) {
-          return response
-            .status(500)
-            .send({ message: 'Error when changing the category', stack: error.stack });
-        }
-        response.status(200).send(JSON.stringify({ "category_id": id, "category_name": category_name }));
-      },
-    );
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -164,6 +178,14 @@ const deleteCategory = (request, response, next) => {
         }
         response.status(200).send(JSON.stringify({ "category_id": id }));
       });
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -186,6 +208,13 @@ const getGoods = (request, response) => {
         response.send(result.rows);
       },
     );
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -200,7 +229,7 @@ const postGood = (request, response) => {
     }
 
     var valid = ajv.validate(postProductSheme, { category_id, product_name, price });
-    
+
     if (valid) {
       client.query('INSERT INTO public.goods (category_id, product_name, price) VALUES ($1, $2, $3)', [category_id, product_name, price],
         (error, results) => {
@@ -218,6 +247,13 @@ const postGood = (request, response) => {
       response.status(400).send('Enter the correct data');
     }
 
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -253,6 +289,14 @@ const putGood = (request, response) => {
       console.error(ajv.errors);
       response.status(400).send('Enter the correct data');
     }
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
@@ -269,9 +313,17 @@ const deleteGood = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the product' });
         }
-        
+
         response.status(200).send(JSON.stringify({ "product_id": id }));
       });
+
+    if (error) {
+      console.error(error);
+
+      return response
+        .status(500)
+        .send({ message: 'Database connection error' });
+    }
   });
 };
 
