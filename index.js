@@ -95,7 +95,7 @@ const deleteCategory = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the category', stack: error.stack });
         }
-        response.status(204).send(`The category deleted with ID: ${id}`);
+        response.status(200).send(JSON.stringify({ "category_id": id }));
       });
   });
 };
@@ -179,7 +179,7 @@ const deleteGood = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the product', stack: error.stack });
         }
-        response.status(204).send(`The product deleted with ID: ${id}`);
+        response.status(200).send(JSON.stringify({ "product_id": id }));
       });
   });
 };
