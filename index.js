@@ -1,21 +1,23 @@
 const { Pool } = require('pg');
 const express = require('express');
 const Ajv = require('ajv');
+const dotenv = require('dotenv')
 
 const app = express();
 app.use(express.json());
 const ajv = Ajv({ allErrors: true });
+dotenv.config()
 
 // db config
 const pool = new Pool({
-  host: 'localhost',
-  database: 'test_db',
-  user: 'postgres',
-  password: 'admin',
-  port: 5432,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  user: process.env.USER,
+  password: process.env.PASSWORD,
+  port: process.env.PORT,
+  max: process.env.MAX,
+  idleTimeoutMillis: process.env.IDLETIMEOUTMILLIS,
+  connectionTimeoutMillis: process.env.CONNECTIONTIMEOUTMILLIS,
 });
 
 // validation sheme
@@ -80,6 +82,7 @@ const postCategory = (request, response) => {
     }
 
     var valid = ajv.validate(postCategorySheme, category_name);
+    
     if (valid) {
       client.query('INSERT INTO public.categories (category_name) VALUES ($1)', [category_name],
         (error, results) => {
@@ -91,7 +94,7 @@ const postCategory = (request, response) => {
               .send({ message: 'Error when creating a category' });
           }
 
-          response.status(201).send(JSON.stringify({ "product_name": product_name }));
+          response.status(201).send(JSON.stringify({ "category_name": category_name }));
         });
     } else {
       console.error(ajv.errors);
@@ -118,19 +121,31 @@ const putCategory = (request, response) => {
         (error, results) => {
           if (error) {
             console.error(error.stack);
-
             return response
               .status(500)
               .send({ message: 'Error when changing the category' });
           }
 
-          response.status(200).send(`The category was modified with ID: ${id}`);
+          response.status(200).send(JSON.stringify({ "category_id": id, "category_name": category_name }));
         },
       );
+      
     } else {
       console.error(ajv.errors);
       response.status(400).send('Enter the correct data');
     }
+    client.query(
+      'UPDATE public.categories SET category_name = $1 WHERE category_id = $2',
+      [category_name, id],
+      (error, results) => {
+        if (error) {
+          return response
+            .status(500)
+            .send({ message: 'Error when changing the category', stack: error.stack });
+        }
+        response.status(200).send(JSON.stringify({ "category_id": id, "category_name": category_name }));
+      },
+    );
   });
 };
 
@@ -147,8 +162,7 @@ const deleteCategory = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the category' });
         }
-
-        response.status(204).send(`The category deleted with ID: ${id}`);
+        response.status(200).send(JSON.stringify({ "category_id": id }));
       });
   });
 };
@@ -157,7 +171,7 @@ const deleteCategory = (request, response, next) => {
 const getGoods = (request, response) => {
   pool.connect((error, client, release) => {
     client.query(
-      'SELECT product_id, product_name,category_name,price FROM public.goods, \
+      'SELECT product_id, product_name, category_name, price FROM public.goods, \
       public.categories WHERE public.goods.category_id = public.categories.category_id',
       (error, result) => {
         release();
@@ -186,6 +200,7 @@ const postGood = (request, response) => {
     }
 
     var valid = ajv.validate(postProductSheme, { category_id, product_name, price });
+    
     if (valid) {
       client.query('INSERT INTO public.goods (category_id, product_name, price) VALUES ($1, $2, $3)', [category_id, product_name, price],
         (error, results) => {
@@ -196,12 +211,13 @@ const postGood = (request, response) => {
               .status(500)
               .send({ message: 'Error when creating a product' });
           }
-          response.status(201).send(results.rows[0]);
+          response.status(201).send(JSON.stringify({ "product_name": product_name }));
         });
     } else {
       console.error(ajv.errors);
       response.status(400).send('Enter the correct data');
     }
+
   });
 };
 
@@ -230,7 +246,7 @@ const putGood = (request, response) => {
               .send({ message: 'Error when changing the product' });
           }
 
-          response.status(200).send(`The product was modified with ID: ${id}`);
+          response.status(200).send(JSON.stringify({ "product_id": id, "product_name": product_name }));
         },
       );
     } else {
@@ -253,8 +269,8 @@ const deleteGood = (request, response, next) => {
             .status(500)
             .send({ message: 'Error when deleting the product' });
         }
-
-        response.status(204).send(`The product deleted with ID: ${id}`);
+        
+        response.status(200).send(JSON.stringify({ "product_id": id }));
       });
   });
 };
